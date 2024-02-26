@@ -1,0 +1,48 @@
+% Define the graph
+connected(nodeA, nodeB, 5).
+connected(nodeA, nodeC, 10).
+connected(nodeB, nodeD, 15).
+connected(nodeC, nodeD, 5).
+connected(nodeB, nodeE, 20).
+connected(nodeD, nodeE, 10).
+
+% Goal state
+goal(nodeD).
+
+% Define a heuristic function
+heuristic_value(Node, Value) :-
+    goal(Goal),
+    connected(Node, Goal, Value).
+
+% Search algorithm
+best_first_search(Start, Path) :-
+    best_first_search([(_, Start)], [], Path).
+
+best_first_search([(H, Node)|_], _, [Node]) :-
+    goal(Node),
+    heuristic_value(Node, H).
+
+best_first_search([(H, Node)|RestQueue], Visited, [Node|Path]) :-
+    findall((NextH, NextNode),
+            (connected(Node, NextNode, _),
+             \+ member(NextNode, Visited),
+             heuristic_value(NextNode, NextH)),
+            NextNodes),
+    merge(NextNodes, RestQueue, NewQueue),
+    best_first_search(NewQueue, [Node|Visited], Path).
+
+merge([], Queue, Queue).
+merge([X|Xs], Queue, NewQueue) :-
+    insert(X, Queue, TempQueue),
+    merge(Xs, TempQueue, NewQueue).
+
+insert(X, [], [X]).
+insert((H1, N1), [(H2, N2)|Rest], [(H1, N1), (H2, N2)|Rest]) :-
+    H1 =< H2.
+insert((H1, N1), [(H2, N2)|Rest], [(H2, N2)|NewRest]) :-
+    H1 > H2,
+    insert((H1, N1), Rest, NewRest).
+
+% Find the optimal path
+find_optimal_path(Start, OptimalPath) :-
+    best_first_search(Start, OptimalPath).
