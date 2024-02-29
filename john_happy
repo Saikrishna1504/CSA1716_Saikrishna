@@ -1,0 +1,8 @@
+/* Define the facts */
+pass_exam(math).
+pass_exam(science).
+pass_exam(history).
+win_lottery(john).
+
+/* Define the rule for John being happy */
+happy(john) :- pass_exam(math), pass_exam(science), pass_exam(history), win_lottery(john).
